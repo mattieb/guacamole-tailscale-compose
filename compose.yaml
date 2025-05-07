@@ -1,67 +1,72 @@
 services:
   init-postgres:
     image: guacamole/guacamole
-    command: >
-      /bin/sh -c '
-      set -ex;
-      if [ ! -f /tmp/postgres-init/initdb.sql ]; then
-        /opt/guacamole/bin/initdb.sh --postgresql >/tmp/postgres-init/initdb.sql;
-      fi'
+
     volumes:
       - ./volumes/postgres/init:/tmp/postgres-init
 
+    command: >
+      /bin/sh -c 'set -ex;
+      if [ ! -f /tmp/postgres-init/initdb.sql ]; then
+        /opt/guacamole/bin/initdb.sh --postgresql >/tmp/postgres-init/initdb.sql;
+      fi'
+
   postgres:
     image: postgres
-    networks:
-      - guacamole
-    restart: unless-stopped
+
+    networks: ["guacamole"]
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./volumes/postgres/init:/docker-entrypoint-initdb.d
       - ./volumes/postgres/data:/var/lib/postgresql/data
-    depends_on:
-      init-postgres:
-        condition: service_completed_successfully
+
     healthcheck:
       test: ["CMD", "pg_isready"]
       start_period: 3s
+    depends_on:
+      init-postgres:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
   guacd:
     image: guacamole/guacd
-    networks:
-      - guacamole
+
+    networks: ["guacamole"]
+
     restart: unless-stopped
 
   guacamole:
     image: guacamole/guacamole
+
     environment:
       GUACD_HOSTNAME: guacd
       POSTGRESQL_DATABASE: postgres
       POSTGRESQL_HOSTNAME: postgres
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRESQL_USER: postgres
-    restart: unless-stopped
+    network_mode: service:tailscale
+
     depends_on:
       postgres:
         condition: service_healthy
-    network_mode: service:tailscale
+    restart: unless-stopped
 
   tailscale:
     image: tailscale/tailscale
-    networks:
-      - guacamole
-    hostname: guacamole
+    
+    cap_add: ["net_admin"]
+    devices:
+      - /dev/net/tun:/dev/net/tun
     environment:
       TS_AUTHKEY: ${TS_AUTHKEY}
       TS_STATE_DIR: /var/lib/tailscale
       TS_USERSPACE: false
+    hostname: guacamole
+    networks: ["guacamole"]
     volumes:
       - ./volumes/tailscale/state:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
+
     restart: unless-stopped
 
 networks:
