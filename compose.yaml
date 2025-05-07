@@ -60,9 +60,9 @@ services:
       - /dev/net/tun:/dev/net/tun
     environment:
       TS_AUTHKEY: ${TS_AUTHKEY}
+      TS_HOSTNAME: ${TS_HOSTNAME}
       TS_STATE_DIR: /var/lib/tailscale
       TS_USERSPACE: false
-    hostname: guacamole
     networks: ["guacamole"]
     volumes:
       - ./volumes/tailscale/state:/var/lib/tailscale

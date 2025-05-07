@@ -12,6 +12,8 @@ An easy [Compose](https://docs.docker.com/compose/) setup to run [Apache Guacamo
 
     -   Get a key from [Keys](https://login.tailscale.com/admin/settings/keys) and put it in "TS_AUTHKEY".
 
+    -   **Optional:** Change "TS_HOSTNAME" if you want to use a different hostname in your tailnet.
+
     -   **Optional:** Change "GUACAMOLE_IMAGE" and "GUACD_IMAGE" if you want to use different images.
 
 3.  Start the compose:
