@@ -31,8 +31,9 @@ services:
 
   guacd:
     image: ${GUACD_IMAGE}
+    entrypoint: ["/opt/guacamole/sbin/guacd", "-f", "-b", "127.0.0.1", "-L", "info"]
 
-    networks: ["guacamole"]
+    network_mode: service:tailscale
 
     restart: unless-stopped
 
@@ -40,7 +41,7 @@ services:
     image: ${GUACAMOLE_IMAGE}
 
     environment:
-      GUACD_HOSTNAME: guacd
+      GUACD_HOSTNAME: 127.0.0.1
       POSTGRESQL_DATABASE: postgres
       POSTGRESQL_HOSTNAME: postgres
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
@@ -59,6 +60,7 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     environment:
+      TS_ACCEPT_DNS: true
       TS_AUTHKEY: ${TS_AUTHKEY}
       TS_HOSTNAME: ${TS_HOSTNAME}
       TS_STATE_DIR: /var/lib/tailscale

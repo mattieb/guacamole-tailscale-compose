@@ -7,6 +7,7 @@
 
 ## Changes
 
+- Reconfigured networking so outgoing connections can also go through the Tailscale host used for the web service.
 - Silenced repeated postgres warnings from the healthcheck.
 
 # 1.0.0
