@@ -1,6 +1,6 @@
 services:
   init-postgres:
-    image: guacamole/guacamole
+    image: ${GUACAMOLE_IMAGE}
 
     volumes:
       - ./volumes/postgres/init:/tmp/postgres-init
@@ -30,14 +30,14 @@ services:
     restart: unless-stopped
 
   guacd:
-    image: guacamole/guacd
+    image: ${GUACD_IMAGE}
 
     networks: ["guacamole"]
 
     restart: unless-stopped
 
   guacamole:
-    image: guacamole/guacamole
+    image: ${GUACAMOLE_IMAGE}
 
     environment:
       GUACD_HOSTNAME: guacd
