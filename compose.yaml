@@ -22,7 +22,7 @@ services:
       - ./volumes/postgres/data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       start_period: 3s
     depends_on:
       init-postgres:
